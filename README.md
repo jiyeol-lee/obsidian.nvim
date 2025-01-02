@@ -404,6 +404,15 @@ This is a complete list of all of the options that can be passed to `require("ob
     -- vim.cmd(':silent exec "!start ' .. url .. '"') -- Windows
   end,
 
+  -- Optional, by default when you use `:ObsidianFollowLink` on a link to an pdf
+  -- file it will be ignored but you can customize this behavior here.
+  ---@param pdf string
+  follow_pdf_func = function(pdf)
+    os.execute('open "' .. pdf .. '"') -- For macOS
+    -- os.execute('xdg-open "' .. pdf .. '"')  -- For Linux
+    -- os.execute('start "" "' .. pdf .. '"') -- For Windows
+  end,
+
   -- Optional, set to true if you use the Obsidian Advanced URI plugin.
   -- https://github.com/Vinzent03/obsidian-advanced-uri
   use_advanced_uri = false,
