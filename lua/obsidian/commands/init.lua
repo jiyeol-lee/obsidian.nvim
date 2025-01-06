@@ -23,6 +23,7 @@ local command_lookups = {
   ObsidianWorkspace = "obsidian.commands.workspace",
   ObsidianRename = "obsidian.commands.rename",
   ObsidianPasteImg = "obsidian.commands.paste_img",
+  ObsidianPasteFile = "obsidian.commands.paste_file",
   ObsidianExtractNote = "obsidian.commands.extract_note",
   ObsidianDebug = "obsidian.commands.debug",
   ObsidianTOC = "obsidian.commands.toc",
@@ -180,6 +181,11 @@ M.register(
 M.register(
   "ObsidianPasteImg",
   { opts = { nargs = "?", complete = "file", desc = "Paste an image from the clipboard" } }
+)
+
+M.register(
+  "ObsidianPasteFile",
+  { opts = { nargs = "?", complete = "file", desc = "Paste an file from the clipboard" } }
 )
 
 M.register(
