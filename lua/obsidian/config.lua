@@ -208,12 +208,20 @@ config.ClientOpts.normalize = function(opts, defaults)
     opts.templates.subdir = nil
   end
 
-  if opts.image_name_func then
+  if opts.image_name_func or opts.file_name_func then
     if opts.attachments == nil then
       opts.attachments = {}
     end
-    opts.attachments.img_name_func = opts.image_name_func
-    opts.image_name_func = nil
+
+    if opts.image_name_func then
+      opts.attachments.img_name_func = opts.image_name_func
+      opts.image_name_func = nil
+    end
+
+    if opts.file_name_func then
+      opts.attachments.file_name_func = opts.file_name_func
+      opts.file_name_func = nil
+    end
   end
 
   --------------------------
@@ -476,6 +484,10 @@ end
 ---@field img_name_func (fun(): string)|?
 ---@field img_text_func fun(client: obsidian.Client, path: obsidian.Path): string
 ---@field confirm_img_paste boolean Whether to confirm the paste or not. Defaults to true.
+---@field file_folder string Default folder to save files to, relative to the vault root.
+---@field file_name_func (fun(): string)|?
+---@field file_text_func fun(client: obsidian.Client, path: obsidian.Path): string
+---@field confirm_file_paste boolean Whether to confirm the paste or not. Defaults to true.
 config.AttachmentsOpts = {}
 
 ---@return obsidian.config.AttachmentsOpts
