@@ -888,7 +888,7 @@ Client.follow_link_async = function(self, link, opts)
         if self.opts.follow_pdf_func ~= nil then
           self.opts.follow_pdf_func(res.location)
         else
-          log.warn "This looks like an image path. You can customize the behavior of images with the 'follow_pdf_func' option."
+          log.warn "This looks like a pdf path. You can customize the behavior of pdfs with the 'follow_pdf_func' option."
         end
         return
       end
