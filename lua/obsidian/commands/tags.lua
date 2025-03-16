@@ -7,13 +7,29 @@ local search = require "obsidian.search"
 ---@param tags string[]
 local function gather_tag_picker_list(client, picker, tags)
   client:find_tags_async(tags, function(tag_locations)
+    local filename_hash = {}
     -- Format results into picker entries, filtering out results that aren't exact matches or sub-tags.
     ---@type obsidian.PickerEntry[]
     local entries = {}
     for _, tag_loc in ipairs(tag_locations) do
+      local has_all_tags = true
       for _, tag in ipairs(tags) do
-        if tag_loc.tag == tag or vim.startswith(tag_loc.tag, tag .. "/") then
-          local display = string.format("%s [%s] %s", tag_loc.note:display_name(), tag_loc.line, tag_loc.text)
+        ---@type string | nil
+        local target_tag = nil
+        for _, note_tag in ipairs(tag_loc.note.tags) do
+          if note_tag == tag or vim.startswith(note_tag, tag .. "/") then
+            target_tag = tag
+            break
+          end
+        end
+        if target_tag == nil then
+          has_all_tags = false
+          break
+        end
+      end
+      if has_all_tags then
+        if #tags == 1 then
+          local display = string.format("%s", tag_loc.note.aliases[1])
           entries[#entries + 1] = {
             value = { path = tag_loc.path, line = tag_loc.line, col = tag_loc.tag_start },
             display = display,
@@ -22,7 +38,19 @@ local function gather_tag_picker_list(client, picker, tags)
             lnum = tag_loc.line,
             col = tag_loc.tag_start,
           }
-          break
+        else
+          if not filename_hash[tostring(tag_loc.path)] then
+            filename_hash[tostring(tag_loc.path)] = true
+            local display = string.format("%s", tag_loc.note.aliases[1])
+            entries[#entries + 1] = {
+              value = { path = tag_loc.path, line = tag_loc.line, col = tag_loc.tag_start },
+              display = display,
+              ordinal = display,
+              filename = tostring(tag_loc.path),
+              lnum = tag_loc.line,
+              col = tag_loc.tag_start,
+            }
+          end
         end
       end
     end
