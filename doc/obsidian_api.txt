@@ -425,6 +425,36 @@ Parameters ~
 {callback} `(fun(tags: string[]))`
 
 ------------------------------------------------------------------------------
+Class ~
+{obsidian.AliasEntry}
+
+Fields ~
+{alias} `(string)`
+{notes} obsidian.Note[]
+
+------------------------------------------------------------------------------
+                                             *obsidian.Client.list_aliases()*
+               `Client.list_aliases`({self}, {term}, {timeout})
+Gather a list of aliases in the vault. If 'term' is provided, only aliases that partially match the search term
+(case-insensitive) will be included.
+
+Parameters ~
+{term} `(string|?)`
+{timeout} `(integer|?)`
+
+Return ~
+obsidian.AliasEntry[]
+
+------------------------------------------------------------------------------
+                                      *obsidian.Client.list_aliases_async()*
+        `Client.list_aliases_async`({self}, {term}, {callback})
+An async version of 'list_aliases()'.
+
+Parameters ~
+{term} `(string|?)`
+{callback} `(fun(aliases: obsidian.AliasEntry[]))`
+
+------------------------------------------------------------------------------
                                                  *obsidian.Client.apply_async()*
                 `Client.apply_async`({self}, {on_note}, {opts})
 Apply a function over all notes in the current vault.

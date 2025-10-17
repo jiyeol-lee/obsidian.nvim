@@ -1525,6 +1525,75 @@ Client.list_tags_async = function(self, term, callback)
   end)
 end
 
+---@class obsidian.AliasEntry
+---
+---@field alias string
+---@field notes obsidian.Note[]
+
+--- Gather a list of aliases in the vault. If 'term' is provided, only aliases that partially match the
+--- search term (case-insensitive) will be included.
+---
+---@param term string|?
+---@param timeout integer|?
+---
+---@return obsidian.AliasEntry[]
+Client.list_aliases = function(self, term, timeout)
+  return block_on(function(cb)
+    return self:list_aliases_async(term, cb)
+  end, timeout)
+end
+
+--- An async version of 'list_aliases()'.
+---
+---@param term string|?
+---@param callback fun(aliases: obsidian.AliasEntry[])
+Client.list_aliases_async = function(self, term, callback)
+  local alias_map = {}
+  local search_term = term and string.lower(term) or nil
+
+  self:apply_async(function(note)
+    for alias in iter(note.aliases) do
+      local alias_str = tostring(alias)
+      if string.len(alias_str) > 0
+        and (search_term == nil or util.string_contains(string.lower(alias_str), search_term))
+      then
+        if alias_map[alias_str] == nil then
+          alias_map[alias_str] = {}
+        end
+
+        local note_list = alias_map[alias_str]
+        local exists = false
+        for _, existing in ipairs(note_list) do
+          if tostring(existing.path) == tostring(note.path) then
+            exists = true
+            break
+          end
+        end
+
+        if not exists then
+          note_list[#note_list + 1] = note
+        end
+      end
+    end
+  end, {
+    on_done = function()
+      local alias_entries = {}
+      for alias_str, note_list in pairs(alias_map) do
+        table.sort(note_list, function(a, b)
+          return tostring(a.path) < tostring(b.path)
+        end)
+        alias_entries[#alias_entries + 1] = { alias = alias_str, notes = note_list }
+      end
+
+      table.sort(alias_entries, function(a, b)
+        return string.lower(a.alias) < string.lower(b.alias)
+      end)
+
+      callback(alias_entries)
+    end,
+  })
+end
+
 --- Apply a function over all notes in the current vault.
 ---
 ---@param on_note fun(note: obsidian.Note)
