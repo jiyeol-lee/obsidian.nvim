@@ -96,6 +96,7 @@ end
 ---@field col integer|?
 ---@field icon string|?
 ---@field icon_hl string|?
+---@field no_path_prefix boolean|?
 
 ---@class obsidian.PickerPickOpts
 ---
@@ -456,7 +457,7 @@ Picker._make_display = function(self, entry)
   ---@type { [1]: { [1]: integer, [2]: integer }, [2]: string }[]
   local highlights = {}
 
-  if entry.filename ~= nil then
+  if entry.filename ~= nil and not entry.no_path_prefix then
     local icon, icon_hl
     if entry.icon then
       icon = entry.icon

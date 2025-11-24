@@ -40,6 +40,7 @@ local function open_alias_picker(client, picker, alias_entries, prompt)
           display = display,
           ordinal = string.format("%s %s", rel_path, alias_entry.alias),
           filename = tostring(note.path),
+          no_path_prefix = true,
         }
 
         local bucket = other_entries
