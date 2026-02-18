@@ -829,6 +829,25 @@ util.get_external_dependency_info = function(cmd)
   end
 end
 
+--- Get temp directory path prefixed with config folder.
+---
+---@param config_folder string The config-relative folder path (e.g., "assets/imgs")
+---@return obsidian.Path The full temp path: $TMPDIR/config_folder or /tmp/config_folder
+util.get_tmp_dir_path = function(config_folder)
+  local Path = require "obsidian.path"
+
+  -- Get TMPDIR from environment, fallback to "/tmp"
+  local tmp_dir = vim.env.TMPDIR or "/tmp"
+
+  -- Remove trailing slash if present to avoid double slashes
+  if vim.endswith(tmp_dir, "/") then
+    tmp_dir = string.sub(tmp_dir, 1, -2)
+  end
+
+  -- Join using Path class
+  return Path:new(tmp_dir) / config_folder
+end
+
 ---Get an iterator of (bufnr, bufname) over all named buffers. The buffer names will be absolute paths.
 ---
 ---@return function () -> (integer, string)|?
