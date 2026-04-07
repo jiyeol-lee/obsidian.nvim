@@ -1,6 +1,7 @@
 local templates = require "obsidian.templates"
 local log = require "obsidian.log"
 local util = require "obsidian.util"
+local Note = require "obsidian.note"
 
 ---@param client obsidian.Client
 return function(client, data)
@@ -11,9 +12,11 @@ return function(client, data)
 
   -- We need to get this upfront before the picker hijacks the current window.
   local insert_location = util.get_active_window_cursor_location()
+  local bufnr = insert_location[1]
+  local note = Note.from_buffer(bufnr)
 
   local function insert_template(name)
-    templates.insert_template { template_name = name, client = client, location = insert_location }
+    templates.insert_template { template_name = name, client = client, location = insert_location, note = note }
   end
 
   if string.len(data.args) > 0 then

@@ -1956,6 +1956,7 @@ Client.write_note_to_buffer = function(self, note, opts)
       template_name = opts.template,
       client = self,
       location = util.get_active_window_cursor_location(),
+      note = note,
     }
   end
 
