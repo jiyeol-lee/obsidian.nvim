@@ -208,20 +208,9 @@ config.ClientOpts.normalize = function(opts, defaults)
     opts.templates.subdir = nil
   end
 
-  if opts.image_name_func or opts.file_name_func then
-    if opts.attachments == nil then
-      opts.attachments = {}
-    end
-
-    if opts.image_name_func then
-      opts.attachments.img_name_func = opts.image_name_func
-      opts.image_name_func = nil
-    end
-
-    if opts.file_name_func then
-      opts.attachments.file_name_func = opts.file_name_func
-      opts.file_name_func = nil
-    end
+  -- Ensure attachments table exists for merge
+  if opts.attachments == nil then
+    opts.attachments = {}
   end
 
   --------------------------
@@ -480,28 +469,17 @@ end
 
 ---@class obsidian.config.AttachmentsOpts
 ---
----@field img_folder string Default folder to save images to, relative to the vault root.
----@field img_name_func (fun(): string)|?
----@field img_text_func fun(client: obsidian.Client, path: obsidian.Path): string
----@field confirm_img_paste boolean Whether to confirm the paste or not. Defaults to true.
----@field file_folder string Default folder to save files to, relative to the vault root.
----@field file_name_func (fun(): string)|?
----@field file_text_func fun(client: obsidian.Client, path: obsidian.Path): string
----@field confirm_file_paste boolean Whether to confirm the paste or not. Defaults to true.
+---@field upload_func (fun(client: obsidian.Client, source_path: string): string|nil)|nil Takes the source file path, uploads/processes it, returns the final URL or path string. Required — no default.
+---@field file_text_func (fun(client: obsidian.Client, result_url: string): string)|nil Takes the result from upload_func and returns the markdown text to insert. Required — no default.
+---@field confirm_paste boolean Whether to confirm the paste before executing upload_func. Defaults to true.
 config.AttachmentsOpts = {}
 
 ---@return obsidian.config.AttachmentsOpts
 config.AttachmentsOpts.default = function()
   return {
-    img_folder = "assets/imgs",
-    ---@param client obsidian.Client
-    ---@param path obsidian.Path the absolute path to the image file
-    ---@return string
-    img_text_func = function(client, path)
-      path = client:vault_relative_path(path) or path
-      return string.format("![%s](%s)", path.name, path)
-    end,
-    confirm_img_paste = true,
+    upload_func = nil,
+    file_text_func = nil,
+    confirm_paste = true,
   }
 end
 

@@ -16,6 +16,7 @@ local command_lookups = {
   ObsidianAlias = "obsidian.commands.alias",
   ObsidianTemplate = "obsidian.commands.template",
   ObsidianNewFromTemplate = "obsidian.commands.new_from_template",
+  ObsidianPaste = "obsidian.commands.paste",
   ObsidianQuickSwitch = "obsidian.commands.quick_switch",
   ObsidianLinkNew = "obsidian.commands.link_new",
   ObsidianLink = "obsidian.commands.link",
@@ -23,8 +24,6 @@ local command_lookups = {
   ObsidianFollowLink = "obsidian.commands.follow_link",
   ObsidianWorkspace = "obsidian.commands.workspace",
   ObsidianRename = "obsidian.commands.rename",
-  ObsidianPasteImg = "obsidian.commands.paste_img",
-  ObsidianPasteFile = "obsidian.commands.paste_file",
   ObsidianExtractNote = "obsidian.commands.extract_note",
   ObsidianDebug = "obsidian.commands.debug",
   ObsidianTOC = "obsidian.commands.toc",
@@ -181,15 +180,7 @@ M.register(
   { opts = { nargs = "?", complete = "file", desc = "Rename note and update all references to it" } }
 )
 
-M.register(
-  "ObsidianPasteImg",
-  { opts = { nargs = "?", complete = "file", desc = "Paste an image from the clipboard" } }
-)
-
-M.register(
-  "ObsidianPasteFile",
-  { opts = { nargs = "?", complete = "file", desc = "Paste an file from the clipboard" } }
-)
+M.register("ObsidianPaste", { opts = { nargs = 0, desc = "Paste image or file from clipboard" } })
 
 M.register(
   "ObsidianExtractNote",
