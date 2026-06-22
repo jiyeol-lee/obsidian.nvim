@@ -771,6 +771,23 @@ util.smart_action = function()
   return "<cmd>ObsidianToggleCheckbox<CR>"
 end
 
+--- Invoke a callback with information about the markdown inline link under the cursor.
+---
+---@param callback fun(type: string|nil, link: string|nil): any
+---
+---@return any
+util.cursor_link_action = function(callback)
+  assert(type(callback) == "function", "callback must be a function")
+
+  local search = require "obsidian.search"
+  local link_location, _, link_type = util.parse_cursor_link()
+  if link_type == search.RefTypes.Markdown then
+    return callback("link", link_location)
+  else
+    return callback(nil, nil)
+  end
+end
+
 ---Get the path to where a plugin is installed.
 ---@param name string|?
 ---@return string|?

@@ -54,6 +54,92 @@ describe("util.cursor_on_markdown_link()", function()
   end)
 end)
 
+describe("util.cursor_link_action()", function()
+  local set_cursor_line = function(line, col)
+    vim.api.nvim_buf_set_lines(0, 0, -1, false, { line })
+    vim.api.nvim_win_set_cursor(0, { 1, col })
+  end
+
+  it("should exist on the public util module", function()
+    assert.equals("function", type(require("obsidian").util.cursor_link_action))
+  end)
+
+  it("should require a callback function", function()
+    assert.has_error(function()
+      util.cursor_link_action(nil)
+    end, "callback must be a function")
+  end)
+
+  it("should call callback with markdown link URL under cursor and return callback result", function()
+    set_cursor_line("The [name](https://example.com) link", 6)
+
+    local callback_type, callback_link
+    local result = util.cursor_link_action(function(link_type, link)
+      callback_type = link_type
+      callback_link = link
+      return "callback-result"
+    end)
+
+    assert.equals("link", callback_type)
+    assert.equals("https://example.com", callback_link)
+    assert.equals("callback-result", result)
+  end)
+
+  it("should call callback with nils when not on a markdown link", function()
+    set_cursor_line("The [name](https://example.com) link", 1)
+
+    local callback_type, callback_link
+    local result = util.cursor_link_action(function(link_type, link)
+      callback_type = link_type
+      callback_link = link
+      return "no-link"
+    end)
+
+    assert.is_nil(callback_type)
+    assert.is_nil(callback_link)
+    assert.equals("no-link", result)
+  end)
+
+  it("should not trigger for wiki links", function()
+    set_cursor_line("The [[wiki-link]] link", 7)
+
+    local callback_type, callback_link
+    util.cursor_link_action(function(link_type, link)
+      callback_type = link_type
+      callback_link = link
+    end)
+
+    assert.is_nil(callback_type)
+    assert.is_nil(callback_link)
+  end)
+
+  it("should not trigger for naked URLs", function()
+    set_cursor_line("The https://example.com link", 6)
+
+    local callback_type, callback_link
+    util.cursor_link_action(function(link_type, link)
+      callback_type = link_type
+      callback_link = link
+    end)
+
+    assert.is_nil(callback_type)
+    assert.is_nil(callback_link)
+  end)
+
+  it("should not trigger for markdown links inside inline code", function()
+    set_cursor_line("The `[name](https://example.com)` link", 8)
+
+    local callback_type, callback_link
+    util.cursor_link_action(function(link_type, link)
+      callback_type = link_type
+      callback_link = link
+    end)
+
+    assert.is_nil(callback_type)
+    assert.is_nil(callback_link)
+  end)
+end)
+
 describe("util.escape_magic_characters()", function()
   it("should correctly escape magic characters", function()
     -- special characters: ^$()%.[]*+-?
