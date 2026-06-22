@@ -10,18 +10,6 @@ describe("util.urlencode()", function()
   end)
 end)
 
-describe("util.urldecode()", function()
-  it("should correctly decode an encoded string", function()
-    local str = [[~/Library/Foo Bar.md]]
-    assert.equals(str, util.urldecode(util.urlencode(str)))
-  end)
-
-  it("should correctly decode an encoded string with path seps", function()
-    local str = [[~/Library/Foo Bar.md]]
-    assert.equals(str, util.urldecode(util.urlencode(str, { keep_path_sep = true })))
-  end)
-end)
-
 describe("util.match_case()", function()
   it("should match case of key to prefix", function()
     assert.equals(util.match_case("Foo", "foo"), "Foo")

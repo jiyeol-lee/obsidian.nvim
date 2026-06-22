@@ -32,8 +32,6 @@ _Keep in mind this plugin is not meant to replace Obsidian, but to complement it
 
 [![See this screenshot](https://github.com/epwalsh/obsidian.nvim/assets/8812459/90d5f218-06cd-4ebb-b00b-b59c2f5c3cc1)](https://github.com/epwalsh/obsidian.nvim/assets/8812459/90d5f218-06cd-4ebb-b00b-b59c2f5c3cc1)
 
-🏃 **Navigation:** Navigate throughout your vault by typing `gf` on any link to another note.
-
 📷 **Images:** Paste images into notes.
 
 💅 **Syntax:** Additional markdown syntax highlighting, concealing, and extmarks for references, tags, and check-boxes.
@@ -42,17 +40,10 @@ _Keep in mind this plugin is not meant to replace Obsidian, but to complement it
 
 ### Commands
 
-- `:ObsidianOpen [QUERY]` to open a note in the Obsidian app.
-  This command has one optional argument: a query used to resolve the note to open by ID, path, or alias. If not given, the note corresponding to the current buffer is opened.
-
 - `:ObsidianNew [TITLE]` to create a new note.
   This command has one optional argument: the title of the new note.
 
 - `:ObsidianQuickSwitch` to quickly switch to (or open) another note in your vault, searching by its name using [ripgrep](https://github.com/BurntSushi/ripgrep) with your preferred picker (see [plugin dependencies](#plugin-dependencies) below).
-
-- `:ObsidianFollowLink [vsplit|hsplit]` to follow a note reference under the cursor, optionally opening it in a vertical or horizontal split.
-
-- `:ObsidianBacklinks` for getting a picker list of references to the current buffer.
 
 - `:ObsidianTags [TAG ...]` for getting a picker list of all occurrences of the given tags.
 
@@ -70,21 +61,9 @@ _Keep in mind this plugin is not meant to replace Obsidian, but to complement it
 
 - `:ObsidianSearch [QUERY]` to search for (or create) notes in your vault using `ripgrep` with your preferred picker.
 
-- `:ObsidianLink [QUERY]` to link an inline visual selection of text to a note.
-  This command has one optional argument: a query that will be used to resolve the note by ID, path, or alias. If not given, the selected text will be used as the query.
-
-- `:ObsidianLinkNew [TITLE]` to create a new note and link it to an inline visual selection of text.
-  This command has one optional argument: the title of the new note. If not given, the selected text will be used as the title.
-
-- `:ObsidianLinks` to collect all links within the current buffer into a picker window.
-
-- `:ObsidianExtractNote [TITLE]` to extract the visually selected text into a new note and link to it.
-
 - `:ObsidianWorkspace [NAME]` to switch to another workspace.
 
-- `:ObsidianPasteImg [IMGNAME]` to paste an image from the clipboard into the note at the cursor position by saving it to the vault and adding a markdown image link. You can configure the default folder to save images to with the `attachments.img_folder` option.
-
-- `:ObsidianRename [NEWNAME] [--dry-run]` to rename the note of the current buffer or reference under the cursor, updating all backlinks across the vault. Since this command is still relatively new and could potentially write a lot of changes to your vault, I highly recommend committing the current state of your vault (if you're using version control) before running it, or doing a dry-run first by appending "--dry-run" to the command, e.g. `:ObsidianRename new-id --dry-run`.
+- `:ObsidianPaste` to paste an image or file from the clipboard into the note at the cursor position. You can configure the paste behavior with the `attachments` option.
 
 - `:ObsidianToggleCheckbox` to cycle through checkbox options.
 
@@ -107,9 +86,8 @@ _Keep in mind this plugin is not meant to replace Obsidian, but to complement it
 
 Specific operating systems also require additional dependencies in order to use all of obsidian.nvim's functionality:
 
-- **Windows WSL** users need [`wsl-open`](https://gitlab.com/4U6U57/wsl-open) for the `:ObsidianOpen` command.
-- **MacOS** users need [`pngpaste`](https://github.com/jcsalterego/pngpaste) (`brew install pngpaste`) for the `:ObsidianPasteImg` command.
-- **Linux** users need xclip (X11) or wl-clipboard (Wayland) for the `:ObsidianPasteImg` command.
+- **MacOS** users need [`pngpaste`](https://github.com/jcsalterego/pngpaste) (`brew install pngpaste`) for the `:ObsidianPaste` command.
+- **Linux** users need xclip (X11) or wl-clipboard (Wayland) for the `:ObsidianPaste` command.
 
 Search functionality (e.g. via the `:ObsidianSearch` and `:ObsidianQuickSwitch` commands) also requires a picker such [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) (see [plugin dependencies](#plugin-dependencies) below).
 
@@ -277,13 +255,6 @@ This is a complete list of all of the options that can be passed to `require("ob
   -- Optional, configure key mappings. These are the defaults. If you don't want to set any keymappings this
   -- way then set 'mappings = {}'.
   mappings = {
-    -- Overrides the 'gf' mapping to work on markdown/wiki links within your vault.
-    ["gf"] = {
-      action = function()
-        return require("obsidian").util.gf_passthrough()
-      end,
-      opts = { noremap = false, expr = true, buffer = true },
-    },
     -- Toggle check-boxes.
     ["<leader>ch"] = {
       action = function()
@@ -291,13 +262,6 @@ This is a complete list of all of the options that can be passed to `require("ob
       end,
       opts = { buffer = true },
     },
-    -- Smart action depending on context, either follow link or toggle checkbox.
-    ["<cr>"] = {
-      action = function()
-        return require("obsidian").util.smart_action()
-      end,
-      opts = { buffer = true, expr = true },
-    }
   },
 
   -- Where to put new notes. Valid options are
@@ -385,42 +349,6 @@ This is a complete list of all of the options that can be passed to `require("ob
     -- A map for custom variables, the key should be the variable and the value a function
     substitutions = {},
   },
-
-  -- Optional, by default when you use `:ObsidianFollowLink` on a link to an external
-  -- URL it will be ignored but you can customize this behavior here.
-  ---@param url string
-  follow_url_func = function(url)
-    -- Open the URL in the default web browser.
-    vim.fn.jobstart({"open", url})  -- Mac OS
-    -- vim.fn.jobstart({"xdg-open", url})  -- linux
-    -- vim.cmd(':silent exec "!start ' .. url .. '"') -- Windows
-    -- vim.ui.open(url) -- need Neovim 0.10.0+
-  end,
-
-  -- Optional, by default when you use `:ObsidianFollowLink` on a link to an image
-  -- file it will be ignored but you can customize this behavior here.
-  ---@param img string
-  follow_img_func = function(img)
-    vim.fn.jobstart { "qlmanage", "-p", img }  -- Mac OS quick look preview
-    -- vim.fn.jobstart({"xdg-open", url})  -- linux
-    -- vim.cmd(':silent exec "!start ' .. url .. '"') -- Windows
-  end,
-
-  -- Optional, by default when you use `:ObsidianFollowLink` on a link to an pdf
-  -- file it will be ignored but you can customize this behavior here.
-  ---@param pdf string
-  follow_pdf_func = function(pdf)
-    os.execute('open "' .. pdf .. '"') -- For macOS
-    -- os.execute('xdg-open "' .. pdf .. '"')  -- For Linux
-    -- os.execute('start "" "' .. pdf .. '"') -- For Windows
-  end,
-
-  -- Optional, set to true if you use the Obsidian Advanced URI plugin.
-  -- https://github.com/Vinzent03/obsidian-advanced-uri
-  use_advanced_uri = false,
-
-  -- Optional, set to true to force ':ObsidianOpen' to bring the app to the foreground.
-  open_app_foreground = false,
 
   picker = {
     -- Set your preferred picker. Can be one of 'telescope.nvim', 'fzf-lua', or 'mini.pick'.
@@ -530,28 +458,29 @@ This is a complete list of all of the options that can be passed to `require("ob
 
   -- Specify how to handle attachments.
   attachments = {
-    -- The default folder to place images in via `:ObsidianPasteImg`.
-    -- If this is a relative path it will be interpreted as relative to the vault root.
-    -- You can always override this per image by passing a full path to the command instead of just a filename.
-    img_folder = "assets/imgs",  -- This is the default
-
-    -- Optional, customize the default name or prefix when pasting images via `:ObsidianPasteImg`.
-    ---@return string
-    img_name_func = function()
-      -- Prefix image names with timestamp.
-      return string.format("%s-", os.time())
-    end,
-
-    -- A function that determines the text to insert in the note when pasting an image.
-    -- It takes two arguments, the `obsidian.Client` and an `obsidian.Path` to the image file.
-    -- This is the default implementation.
+    -- A function that takes the source file path and uploads/processes it, returning the
+    -- final URL or path string to use in the markdown link.
+    -- This is required to use `:ObsidianPaste`.
     ---@param client obsidian.Client
-    ---@param path obsidian.Path the absolute path to the image file
-    ---@return string
-    img_text_func = function(client, path)
-      path = client:vault_relative_path(path) or path
-      return string.format("![%s](%s)", path.name, path)
+    ---@param source_path string the absolute path to the source file
+    ---@return string|nil
+    upload_func = function(client, source_path)
+      local path = client:vault_relative_path(source_path) or source_path
+      return tostring(path)
     end,
+
+    -- A function that takes the result from `upload_func` and returns the markdown text
+    -- to insert into the note.
+    -- This is required to use `:ObsidianPaste`.
+    ---@param client obsidian.Client
+    ---@param result_url string the URL or path returned by `upload_func`
+    ---@return string
+    file_text_func = function(client, result_url)
+      return string.format("![%s](%s)", vim.fn.fnamemodify(result_url, ":t"), result_url)
+    end,
+
+    -- Whether to confirm the paste before executing `upload_func`.
+    confirm_paste = true,
   },
 }
 ```
@@ -650,41 +579,6 @@ If you wish to use the formatting concealment features, you will need to have `c
 #### Note naming and location
 
 The `notes_subdir` and `note_id_func` options are not mutually exclusive. You can use them both. For example, using a combination of both of the above settings, a new note called "My new note" will assigned a path like `notes/1657296016-my-new-note.md`.
-
-#### `gf` passthrough
-
-If you want the `gf` passthrough functionality but you've already overridden the `gf` keybinding, just change your `gf` mapping definition to something like this:
-
-```lua
-vim.keymap.set("n", "gf", function()
-  if require("obsidian").util.cursor_on_markdown_link() then
-    return "<cmd>ObsidianFollowLink<CR>"
-  else
-    return "gf"
-  end
-end, { noremap = false, expr = true })
-```
-
-Then make sure to comment out the `gf` keybinding in your obsidian.nvim config:
-
-```lua
-mappings = {
-  -- ["gf"] = ...
-},
-```
-
-Or alternatively you could map obsidian.nvim's follow functionality to a different key:
-
-```lua
-mappings = {
-  ["fo"] = {
-    action = function()
-      return require("obsidian").util.gf_passthrough()
-    end,
-    opts = { noremap = false, expr = true, buffer = true },
-  },
-},
-```
 
 ### Using templates
 

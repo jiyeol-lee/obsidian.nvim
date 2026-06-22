@@ -15,17 +15,12 @@ local config = {}
 ---@field wiki_link_func (fun(opts: {path: string, label: string, id: string|?}): string)
 ---@field markdown_link_func (fun(opts: {path: string, label: string, id: string|?}): string)
 ---@field preferred_link_style obsidian.config.LinkStyle
----@field follow_url_func fun(url: string)|?
----@field follow_img_func fun(img: string)|?
----@field follow_pdf_func fun(pdf: string)|?
 ---@field note_frontmatter_func (fun(note: obsidian.Note): table)|?
 ---@field disable_frontmatter (fun(fname: string?): boolean)|boolean|?
 ---@field completion obsidian.config.CompletionOpts
 ---@field mappings obsidian.config.MappingOpts
 ---@field picker obsidian.config.PickerOpts
 ---@field daily_notes obsidian.config.DailyNotesOpts
----@field use_advanced_uri boolean|?
----@field open_app_foreground boolean|?
 ---@field sort_by obsidian.config.SortBy|?
 ---@field sort_reversed boolean|?
 ---@field search_max_lines integer
@@ -50,15 +45,12 @@ config.ClientOpts.default = function()
     wiki_link_func = util.wiki_link_id_prefix,
     markdown_link_func = util.markdown_link,
     preferred_link_style = config.LinkStyle.wiki,
-    follow_url_func = nil,
     note_frontmatter_func = nil,
     disable_frontmatter = false,
     completion = config.CompletionOpts.default(),
     mappings = config.MappingOpts.default(),
     picker = config.PickerOpts.default(),
     daily_notes = config.DailyNotesOpts.default(),
-    use_advanced_uri = nil,
-    open_app_foreground = false,
     sort_by = "modified",
     sort_reversed = true,
     search_max_lines = 1000,
@@ -301,9 +293,7 @@ config.MappingOpts.default = function()
   local mappings = require "obsidian.mappings"
 
   return {
-    ["gf"] = mappings.gf_passthrough(),
     ["<leader>ch"] = mappings.toggle_checkbox(),
-    ["<cr>"] = mappings.smart_action(),
   }
 end
 

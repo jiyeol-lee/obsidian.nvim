@@ -9,13 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Added `opts.follow_img_func` option for customizing how to handle image paths.
 - Added better handling for undefined template fields, which will now be prompted for.
-- Added `opts.follow_pdf_func` option for customizing how to handle pdf paths.
 
 ### Changed
 
 - Renamed `opts.image_name_func` to `opts.attachments.img_name_func`.
+
+### Removed
+
+- Removed `:ObsidianOpen`, `:ObsidianFollowLink`, `:ObsidianBacklinks`, `:ObsidianLinks`, and `:ObsidianRename` commands.
+- Removed `:ObsidianLink`, `:ObsidianLinkNew`, and `:ObsidianExtractNote` commands.
+- Removed `opts.follow_url_func`, `opts.follow_img_func`, `opts.follow_pdf_func`, `opts.use_advanced_uri`, and `opts.open_app_foreground` options.
+- Removed `gf_passthrough` and `smart_action` mapping helpers.
+- Removed `Client.follow_link_async`, `Client.resolve_link_async`, `Client.find_backlinks` / `Client.find_backlinks_async`, and `Client.resolve_note` / `Client.resolve_note_async` methods.
 
 ### Fixed
 

@@ -114,10 +114,6 @@ local char_to_hex = function(c)
   return string.format("%%%02X", string.byte(c))
 end
 
-local hex_to_char = function(hex)
-  return string.char(tonumber(hex, 16))
-end
-
 --- Encode a string into URL-safe version.
 ---
 ---@param str string
@@ -139,16 +135,6 @@ util.urlencode = function(str, opts)
   -- function.
   url = url:gsub(" ", "%%20")
   return url
-end
-
---- Decode a URL-encoded string.
----
----@param str string
----
----@return string
-util.urldecode = function(str)
-  str = str:gsub("%%(%x%x)", hex_to_char)
-  return str
 end
 
 ---Match the case of 'key' to the given 'prefix' of the key.
@@ -191,24 +177,6 @@ util.is_url = function(s)
   else
     return false
   end
-end
-
-util.is_img = function(s)
-  for _, suffix in ipairs { ".png", ".jpg", ".jpeg", ".heic", ".gif", ".svg", ".ico" } do
-    if vim.endswith(s, suffix) then
-      return true
-    end
-  end
-  return false
-end
-
-util.is_pdf = function(s)
-  for _, suffix in ipairs { ".pdf" } do
-    if vim.endswith(s, suffix) then
-      return true
-    end
-  end
-  return false
 end
 
 -- This function removes a single backslash within double square brackets
@@ -752,25 +720,6 @@ util.cursor_tag = function(line, col)
   return nil
 end
 
-util.gf_passthrough = function()
-  if util.cursor_on_markdown_link(nil, nil, true) then
-    return "<cmd>ObsidianFollowLink<CR>"
-  else
-    return "gf"
-  end
-end
-
-util.smart_action = function()
-  -- follow link if possible
-  if util.cursor_on_markdown_link(nil, nil, true) then
-    return "<cmd>ObsidianFollowLink<CR>"
-  end
-
-  -- toggle task if possible
-  -- cycles through your custom UI checkboxes, default: [ ] [~] [>] [x]
-  return "<cmd>ObsidianToggleCheckbox<CR>"
-end
-
 --- Invoke a callback with information about the markdown inline link under the cursor.
 ---
 ---@param callback fun(type: string|nil, link: string|nil): any
@@ -863,26 +812,6 @@ util.get_tmp_dir_path = function(config_folder)
 
   -- Join using Path class
   return Path:new(tmp_dir) / config_folder
-end
-
----Get an iterator of (bufnr, bufname) over all named buffers. The buffer names will be absolute paths.
----
----@return function () -> (integer, string)|?
-util.get_named_buffers = function()
-  local idx = 0
-  local buffers = vim.api.nvim_list_bufs()
-
-  ---@return integer|?
-  ---@return string|?
-  return function()
-    while idx < #buffers do
-      idx = idx + 1
-      local bufnr = buffers[idx]
-      if vim.api.nvim_buf_is_loaded(bufnr) then
-        return bufnr, vim.api.nvim_buf_get_name(bufnr)
-      end
-    end
-  end
 end
 
 ---Insert text at current cursor position.
